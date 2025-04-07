@@ -1,0 +1,10 @@
+# Scala-CLI specific directories
+/.scala-build/
+/.bsp/
+
+# Compiled files
+*.class
+*.log
+
+# Metals (Scala Language Server) files
+/.metals/
