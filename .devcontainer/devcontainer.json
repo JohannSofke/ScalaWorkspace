@@ -1,0 +1,13 @@
+{
+    "name": "Scala-CLI Development",
+    "image": "mcr.microsoft.com/devcontainers/universal:latest",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "scalameta.metals"
+            ]
+        }
+    },
+    "postCreateCommand": "curl -fL https://github.com/Virtuslab/scala-cli/releases/latest/download/scala-cli-x86_64-pc-linux.gz | gzip -d > scala-cli && chmod +x scala-cli && sudo mv scala-cli /usr/local/bin/scala-cli",
+    "postAttachCommand": "scala-cli clean . && scala-cli compile . && scala-cli test ."
+}
