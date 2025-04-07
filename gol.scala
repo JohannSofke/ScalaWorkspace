@@ -18,3 +18,12 @@ private def clearScreen(): Unit =
 
 private def square(x: Int): Int =
   x * x
+
+// Testing packaged functions
+import utest.*
+
+private object GolTestSuite extends TestSuite:
+  val tests = Tests:
+    test("Quadriere Ganzzahl"):
+      val x = square(10)
+      x ==> 100
