@@ -1,6 +1,5 @@
 # Scala-CLI specific directories
 /.scala-build/
-/.bsp/
 
 # Compiled files
 *.class
