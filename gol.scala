@@ -3,9 +3,8 @@ package gol
 import scala.util.Random
 import scala.compiletime.ops.int
 
-enum Character {
+enum Character:
   case On, Off, Up, Down
-}
 
 def init(): Unit =
   println("Einmal")
@@ -25,9 +24,9 @@ private def clearScreen(): Unit =
 
 def printCharacter(c: Character): Unit =
   c match
-    case Character.On  => print("█")
-    case Character.Off => print(" ")
-    case Character.Up  => print("▀")
+    case Character.On   => print("█")
+    case Character.Off  => print(" ")
+    case Character.Up   => print("▀")
     case Character.Down => print("▄")
 
 private def square(x: Int): Int =
