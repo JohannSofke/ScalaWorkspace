@@ -19,8 +19,8 @@ def loop(): Unit =
       Vector(Character.On, Character.Off, Character.Up, Character.Down, Character.LineBreak),
       Vector(Character.On, Character.Off, Character.Up, Character.Down, Character.LineBreak),
     )
-
-  flatWorld.map(_.map(printCharacter(_)))
+  
+  printFlatWorld(flatWorld)
 
 def delay(): Unit =
   Thread.sleep(500)
@@ -35,6 +35,9 @@ def printCharacter(c: Character): Unit =
     case Character.Up   => print("▀")
     case Character.Down => print("▄")
     case Character.LineBreak => println()
+
+def printFlatWorld(world: Vector[Vector[Character]]): Unit =
+  world.foreach(_.foreach(printCharacter(_)))
 
 private def square(x: Int): Int =
   x * x
