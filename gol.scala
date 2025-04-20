@@ -11,10 +11,11 @@ def init(): Unit =
 
 def loop(): Unit =
   clearScreen()
-  printCharacter(Character.On)
-  printCharacter(Character.Off)
-  printCharacter(Character.Up)
-  printCharacter(Character.Down)
+
+  val lineWorld =
+    Vector(Character.On, Character.Off, Character.Up, Character.Down)
+    
+  lineWorld.map(printCharacter(_))
 
 def delay(): Unit =
   Thread.sleep(500)
