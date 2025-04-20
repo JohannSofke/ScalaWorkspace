@@ -4,7 +4,7 @@ import scala.util.Random
 import scala.compiletime.ops.int
 
 enum Character:
-  case On, Off, Up, Down
+  case On, Off, Up, Down, LineBreak
 
 def init(): Unit =
   println("Einmal")
@@ -12,10 +12,15 @@ def init(): Unit =
 def loop(): Unit =
   clearScreen()
 
-  val lineWorld =
-    Vector(Character.On, Character.Off, Character.Up, Character.Down)
-    
-  lineWorld.map(printCharacter(_))
+  val flatWorld =
+    Vector(
+      Vector(Character.On, Character.Off, Character.Up, Character.Down, Character.LineBreak),
+      Vector(Character.On, Character.Off, Character.Up, Character.Down, Character.LineBreak),
+      Vector(Character.On, Character.Off, Character.Up, Character.Down, Character.LineBreak),
+      Vector(Character.On, Character.Off, Character.Up, Character.Down, Character.LineBreak),
+    )
+
+  flatWorld.map(_.map(printCharacter(_)))
 
 def delay(): Unit =
   Thread.sleep(500)
@@ -29,6 +34,7 @@ def printCharacter(c: Character): Unit =
     case Character.Off  => print(" ")
     case Character.Up   => print("▀")
     case Character.Down => print("▄")
+    case Character.LineBreak => println()
 
 private def square(x: Int): Int =
   x * x
