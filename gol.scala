@@ -3,12 +3,18 @@ package gol
 import scala.util.Random
 import scala.compiletime.ops.int
 
+val HIDE_CURSOR = "\u001b[?25l"
+val SHOW_CURSOR = "\u001b[?25h"
+
 enum Character:
   case On, Off, Up, Down, LineBreak
 
 def init(): Unit =
-  println("Einmal")
-
+  scala.sys.addShutdownHook(
+    print(SHOW_CURSOR)
+  )
+  print(HIDE_CURSOR)
+  
 def loop(): Unit =
   clearScreen()
 
