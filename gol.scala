@@ -14,12 +14,12 @@ def init(): Unit =
     print(SHOW_CURSOR)
   )
   print(HIDE_CURSOR)
-  
+
 def loop(): Unit =
   clearScreen()
 
   val flatWorld = generateFlatWorld(10, 4)
-  
+
   printFlatWorld(flatWorld)
 
 def delay(): Unit =
@@ -30,10 +30,10 @@ private def clearScreen(): Unit =
 
 def printCharacter(c: Character): Unit =
   c match
-    case Character.On   => print("█")
-    case Character.Off  => print(" ")
-    case Character.Up   => print("▀")
-    case Character.Down => print("▄")
+    case Character.On        => print("█")
+    case Character.Off       => print(" ")
+    case Character.Up        => print("▀")
+    case Character.Down      => print("▄")
     case Character.LineBreak => println()
 
 def printFlatWorld(world: Vector[Vector[Character]]): Unit =
@@ -43,7 +43,8 @@ def printFlatWorld(world: Vector[Vector[Character]]): Unit =
 def generateFlatWorld(breite: Int, höhe: Int): Vector[Vector[Character]] =
   val flatWorld = Vector.fill(höhe, breite)(Random.nextInt(2) match
     case 0 => Character.Off
-    case 1 => Character.On)
+    case 1 => Character.On
+  )
   flatWorld
 
 private def square(x: Int): Int =
