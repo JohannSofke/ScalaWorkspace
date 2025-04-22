@@ -18,7 +18,7 @@ def init(): Unit =
 def loop(): Unit =
   clearScreen()
 
-  val flatWorld = generateFlatWorld(10, 4)
+  val flatWorld = generateFlatWorld(20, 10)
 
   printFlatWorld(flatWorld)
 
