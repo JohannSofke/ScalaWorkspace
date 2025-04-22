@@ -14,10 +14,10 @@ def loop(): Unit =
 
   val flatWorld =
     Vector(
-      Vector(Character.On, Character.Off, Character.Up, Character.Down, Character.LineBreak),
-      Vector(Character.On, Character.Off, Character.Up, Character.Down, Character.LineBreak),
-      Vector(Character.On, Character.Off, Character.Up, Character.Down, Character.LineBreak),
-      Vector(Character.On, Character.Off, Character.Up, Character.Down, Character.LineBreak),
+      Vector(Character.On, Character.Off, Character.Up, Character.Down),
+      Vector(Character.On, Character.Off, Character.Up, Character.Down),
+      Vector(Character.On, Character.Off, Character.Up, Character.Down),
+      Vector(Character.On, Character.Off, Character.Up, Character.Down),
     )
   
   printFlatWorld(flatWorld)
@@ -37,7 +37,8 @@ def printCharacter(c: Character): Unit =
     case Character.LineBreak => println()
 
 def printFlatWorld(world: Vector[Vector[Character]]): Unit =
-  world.foreach(_.foreach(printCharacter(_)))
+  val worldLinebreak = world.map(_ :+ Character.LineBreak)
+  worldLinebreak.map(_.map(printCharacter(_)))
 
 private def square(x: Int): Int =
   x * x
