@@ -12,13 +12,7 @@ def init(): Unit =
 def loop(): Unit =
   clearScreen()
 
-  val flatWorld =
-    Vector(
-      Vector(Character.On, Character.Off, Character.Up, Character.Down),
-      Vector(Character.On, Character.Off, Character.Up, Character.Down),
-      Vector(Character.On, Character.Off, Character.Up, Character.Down),
-      Vector(Character.On, Character.Off, Character.Up, Character.Down),
-    )
+  val flatWorld = generateFlatWorld(10, 4)
   
   printFlatWorld(flatWorld)
 
@@ -40,6 +34,12 @@ def printFlatWorld(world: Vector[Vector[Character]]): Unit =
   val worldLinebreak = world.map(_ :+ Character.LineBreak)
   worldLinebreak.map(_.map(printCharacter(_)))
 
+def generateFlatWorld(breite: Int, höhe: Int): Vector[Vector[Character]] =
+  val flatWorld = Vector.fill(höhe, breite)(Random.nextInt(2) match
+    case 0 => Character.Off
+    case 1 => Character.On)
+  flatWorld
+
 private def square(x: Int): Int =
   x * x
 
@@ -51,3 +51,12 @@ private object GolTestSuite extends TestSuite:
     test("Quadriere Ganzzahl"):
       val x = square(10)
       x ==> 100
+
+    test("FlatWorld hat Größe von 10 x 4 Elementen"):
+      val flatWorld = generateFlatWorld(10, 4)
+      flatWorld.size ==> 4
+      flatWorld(0).size ==> 10
+
+    test("FlatWorld ist vom Typ Vector[Vector[Character]]"):
+      val flatWorld = generateFlatWorld(10, 4)
+      flatWorld.isInstanceOf[Vector[Vector[Character]]] ==> true
