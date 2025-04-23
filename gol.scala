@@ -3,6 +3,8 @@ package gol
 import scala.util.Random
 import scala.compiletime.ops.int
 
+type Matrix[T] = Vector[Vector[T]]
+
 val HIDE_CURSOR = "\u001b[?25l"
 val SHOW_CURSOR = "\u001b[?25h"
 
@@ -36,21 +38,18 @@ def printCharacter(c: Character): Unit =
     case Character.Down      => print("▄")
     case Character.LineBreak => println()
 
-def printFlatWorld(world: Vector[Vector[Character]]): Unit =
+def printFlatWorld(world: Matrix[Character]): Unit =
   val worldLinebreak = world.map(_ :+ Character.LineBreak)
   worldLinebreak.map(_.map(printCharacter(_)))
 
-def generateFlatWorld(breite: Int, höhe: Int): Vector[Vector[Character]] =
+def generateFlatWorld(breite: Int, höhe: Int): Matrix[Character] =
   val flatWorld = Vector.fill(höhe, breite)(Random.nextInt(2) match
     case 0 => Character.Off
     case 1 => Character.On
   )
   flatWorld
 
-def convolute(
-    kernel: Vector[Vector[Int]],
-    input: Vector[Vector[Int]]
-): Vector[Vector[Int]] =
+def convolute(kernel: Matrix[Int], input: Matrix[Int]): Matrix[Int] =
   input
     .sliding(kernel.size)
     .map(
@@ -78,7 +77,7 @@ private object GolTestSuite extends TestSuite:
       flatWorld.size ==> 4
       flatWorld(0).size ==> 10
 
-    test("FlatWorld ist vom Typ Vector[Vector[Character]]"):
+    test("FlatWorld ist vom TypMatrix[Character]"):
       val flatWorld = generateFlatWorld(10, 4)
       flatWorld.isInstanceOf[Vector[Vector[Character]]] ==> true
 
