@@ -47,6 +47,20 @@ def generateFlatWorld(breite: Int, höhe: Int): Vector[Vector[Character]] =
   )
   flatWorld
 
+def convolute(
+    kernel: Vector[Vector[Int]],
+    input: Vector[Vector[Int]]
+): Vector[Vector[Int]] =
+  input
+    .sliding(kernel.size)
+    .map(
+      _.transpose
+        .sliding(kernel(0).size)
+        .toVector
+        .map(_.flatten.zip(kernel.flatten).map(_ * _).sum)
+    )
+    .toVector
+
 private def square(x: Int): Int =
   x * x
 
@@ -67,3 +81,22 @@ private object GolTestSuite extends TestSuite:
     test("FlatWorld ist vom Typ Vector[Vector[Character]]"):
       val flatWorld = generateFlatWorld(10, 4)
       flatWorld.isInstanceOf[Vector[Vector[Character]]] ==> true
+
+    test("Bestimme die lebenden Nachbarn"):
+      val flatWorld = Vector(
+        Vector(1, 0, 1, 1, 0),
+        Vector(1, 1, 0, 0, 1),
+        Vector(0, 1, 0, 1, 0),
+        Vector(0, 0, 1, 0, 1)
+      )
+      val kernel = Vector(
+        Vector(1, 1, 1),
+        Vector(1, 0, 1),
+        Vector(1, 1, 1)
+      )
+      val ExepectedNeighbors = Vector(
+        Vector(4, 5, 4),
+        Vector(3, 4, 3)
+      )
+      val neighbors = convolute(kernel, flatWorld)
+      neighbors ==> ExepectedNeighbors
