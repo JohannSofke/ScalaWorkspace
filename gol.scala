@@ -65,18 +65,11 @@ def formDonutWorld[T](m: Matrix[T]): Matrix[T] =
   val mLeftRight = mUpDown.map(row => row.last +: row :+ row.head)
   mLeftRight
 
-private def square(x: Int): Int =
-  x * x
-
 // Testing packaged functions
 import utest.*
 
 private object GolTestSuite extends TestSuite:
   val tests = Tests:
-    test("Quadriere Ganzzahl"):
-      val x = square(10)
-      x ==> 100
-
     test("FlatWorld hat Größe von 10 x 4 Elementen"):
       val flatWorld = generateFlatWorld(10, 4)
       flatWorld.size ==> 4
