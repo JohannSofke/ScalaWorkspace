@@ -7,6 +7,9 @@ def hello(): Unit =
 
 @tailrec
 def loop(state: Vector[Vector[Boolean]]): Unit =
-  val nextState = gol.loop(state)
-  gol.delay()
+  effects.clearScreen()
+  effects.showWorld(state)
+  effects.delay()
+  
+  val nextState = gol.loop(state) 
   loop(nextState)

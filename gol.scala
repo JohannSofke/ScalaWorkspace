@@ -21,38 +21,15 @@ def init(): Matrix[Boolean] =
   flatWorld
 
 def loop(flatWorld: Matrix[Boolean]): Matrix[Boolean] =
-  clearScreen()
-
-  printFlatWorld(flatWorld)
-
   val donutWorld = formDonutWorld(flatWorld)
   val neighbors = countNeighbors(donutWorld)
   val newFlatWorld = updateFlatWorld(flatWorld, neighbors)
   newFlatWorld
 
-def delay(): Unit =
-  Thread.sleep(500)
-
-private def clearScreen(): Unit =
-  println("\u001bc")
-
-def printCharacter(c: Character): Unit =
-  c match
-    case Character.On        => print("█")
-    case Character.Off       => print(" ")
-    case Character.Up        => print("▀")
-    case Character.Down      => print("▄")
-    case Character.LineBreak => println()
-
-def characterFromBoolean(b: Boolean): Character =
+def characterFromBoolean(b: Boolean): Character = 
   b match
     case true  => Character.On
     case false => Character.Off
-
-def printFlatWorld(world: Matrix[Boolean]): Unit =
-  val worldCharacter = world.map(_.map(characterFromBoolean(_)))
-  val worldLinebreak = worldCharacter.map(_ :+ Character.LineBreak)
-  worldLinebreak.map(_.map(printCharacter(_)))
 
 def generateFlatWorld(breite: Int, höhe: Int): Matrix[Boolean] =
   val flatWorld = Vector.fill(höhe, breite)(Random.nextInt(2) match
