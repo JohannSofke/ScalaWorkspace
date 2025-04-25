@@ -27,7 +27,8 @@ def loop(flatWorld: Matrix[Boolean]): Matrix[Boolean] =
 
   val donutWorld = formDonutWorld(flatWorld)
   val neighbors = countNeighbors(donutWorld)
-  flatWorld
+  val newFlatWorld = updateFlatWorld(flatWorld, neighbors)
+  newFlatWorld
 
 def delay(): Unit =
   Thread.sleep(500)
@@ -59,6 +60,7 @@ def generateFlatWorld(breite: Int, höhe: Int): Matrix[Boolean] =
     case 1 => true
   )
   flatWorld
+
 def countNeighbors(donutWorld: Matrix[Boolean]): Matrix[Int] =
   val kernel = Vector(
     Vector(1, 1, 1),
@@ -84,6 +86,13 @@ def formDonutWorld[T](m: Matrix[T]): Matrix[T] =
   val mUpDown = m.last +: m :+ m.head
   val mLeftRight = mUpDown.map(row => row.last +: row :+ row.head)
   mLeftRight
+
+def updateFlatWorld(flatWorld: Matrix[Boolean], neighbors: Matrix[Int]): Matrix[Boolean] =
+  flatWorld.zip(neighbors).map: (rowFW, rowN) =>
+    rowFW.zip(rowN).map: (cellFW, cellN) =>
+      if cellFW && (cellN == 2 || cellN == 3) then true
+      else if !cellFW && cellN == 3 then true
+      else false
 
 // Testing packaged functions
 import utest.*
@@ -137,3 +146,18 @@ private object GolTestSuite extends TestSuite:
       test("Konvertiere Boolean in Character"):
         characterFromBoolean(true) ==> Character.On
         characterFromBoolean(false) ==> Character.Off
+
+      test("Spielregeln"):
+        val flatWorld = Vector(
+          Vector(true, true),
+          Vector(true, false)
+        )
+        val neighbors = Vector(
+          Vector(1, 2),
+          Vector(4, 3),
+        )
+        val expectedNewFlatWorld = Vector(
+          Vector(false, true),
+          Vector(false, true),
+        )
+        updateFlatWorld(flatWorld, neighbors) ==> expectedNewFlatWorld
