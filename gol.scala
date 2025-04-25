@@ -20,10 +20,14 @@ def init(): Matrix[Boolean] =
   val flatWorld = generateFlatWorld(20, 10)
   flatWorld
 
-def loop(state: Matrix[Boolean]): Matrix[Boolean] =
+def loop(flatWorld: Matrix[Boolean]): Matrix[Boolean] =
   clearScreen()
-  printFlatWorld(state)
-  state
+
+  printFlatWorld(flatWorld)
+
+  val donutWorld = formDonutWorld(flatWorld)
+  val neighbors = countNeighbors(donutWorld)
+  flatWorld
 
 def delay(): Unit =
   Thread.sleep(500)
@@ -55,8 +59,17 @@ def generateFlatWorld(breite: Int, höhe: Int): Matrix[Boolean] =
     case 1 => true
   )
   flatWorld
+def countNeighbors(donutWorld: Matrix[Boolean]): Matrix[Int] =
+  val kernel = Vector(
+    Vector(1, 1, 1),
+    Vector(1, 0, 1),
+    Vector(1, 1, 1)
+  )
+  convolute(kernel, donutWorld)
 
-def convolute(kernel: Matrix[Int], input: Matrix[Int]): Matrix[Int] =
+def convolute(kernel: Matrix[Int], input: Matrix[Boolean]): Matrix[Int] =
+  implicit def bool2int(b: Boolean): Int = if b then 1 else 0
+
   input
     .sliding(kernel.size)
     .map(
@@ -88,10 +101,10 @@ private object GolTestSuite extends TestSuite:
 
     test("Bestimme die lebenden Nachbarn"):
       val flatWorld = Vector(
-        Vector(1, 0, 1, 1, 0),
-        Vector(1, 1, 0, 0, 1),
-        Vector(0, 1, 0, 1, 0),
-        Vector(0, 0, 1, 0, 1)
+        Vector(true, false, true, true, false),
+        Vector(true, true, false, false, true),
+        Vector(false, true, false, true, false),
+        Vector(false, false, true, false, true)
       )
       val kernel = Vector(
         Vector(1, 1, 1),
