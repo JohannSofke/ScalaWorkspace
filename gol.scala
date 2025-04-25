@@ -60,6 +60,11 @@ def convolute(kernel: Matrix[Int], input: Matrix[Int]): Matrix[Int] =
     )
     .toVector
 
+def formDonutWorld[T](m: Matrix[T]): Matrix[T] =
+  val mUpDown = m.last +: m :+ m.head
+  val mLeftRight = mUpDown.map(row => row.last +: row :+ row.head)
+  mLeftRight
+
 private def square(x: Int): Int =
   x * x
 
@@ -99,3 +104,19 @@ private object GolTestSuite extends TestSuite:
       )
       val neighbors = convolute(kernel, flatWorld)
       neighbors ==> ExepectedNeighbors
+
+    test("Forme eine Donut-Welt"):
+      val flatWorld = Vector(
+        Vector(1, 2, 3),
+        Vector(4, 5, 6),
+        Vector(7, 8, 9)
+      )
+      val expectedDonutWorld = Vector(
+        Vector(9, 7, 8, 9, 7),
+        Vector(3, 1, 2, 3, 1),
+        Vector(6, 4, 5, 6, 4),
+        Vector(9, 7, 8, 9, 7),
+        Vector(3, 1, 2, 3, 1)
+      )
+      val donutWorld = formDonutWorld(flatWorld)
+      donutWorld ==> expectedDonutWorld
