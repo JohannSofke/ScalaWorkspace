@@ -6,10 +6,8 @@ def delay(): Unit =
 def clearScreen(): Unit =
   println("\u001bc")
 
-def showWorld(world: gol.Matrix[Boolean]): Unit =
-  val worldCharacter = world.map(_.map(gol.characterFromBoolean(_)))
-  val worldLinebreak = worldCharacter.map(_ :+ gol.Character.LineBreak)
-  worldLinebreak.map(_.map(printCharacter(_)))
+def showWorld(world: gol.Matrix[gol.Character]): Unit =  
+  world.map(_.map(printCharacter(_)))
 
 private def printCharacter(c: gol.Character): Unit =
   c match

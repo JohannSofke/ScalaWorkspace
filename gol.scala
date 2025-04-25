@@ -71,6 +71,11 @@ def updateFlatWorld(flatWorld: Matrix[Boolean], neighbors: Matrix[Int]): Matrix[
       else if !cellFW && cellN == 3 then true
       else false
 
+def prepareToShow(flatWorld: Matrix[Boolean]): Matrix[Character] =
+  val worldCharacter = flatWorld.map(_.map(characterFromBoolean(_)))
+  val worldLinebreak = worldCharacter.map(_ :+ Character.LineBreak)
+  worldLinebreak 
+
 // Testing packaged functions
 import utest.*
 

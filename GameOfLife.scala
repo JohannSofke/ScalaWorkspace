@@ -6,9 +6,9 @@ def hello(): Unit =
   loop(initialState)
 
 @tailrec
-def loop(state: Vector[Vector[Boolean]]): Unit =
+def loop(state: gol.Matrix[Boolean]): Unit =
   effects.clearScreen()
-  effects.showWorld(state)
+  effects.showWorld(gol.prepareToShow(state))
   effects.delay()
   
   val nextState = gol.loop(state) 
