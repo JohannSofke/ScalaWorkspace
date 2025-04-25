@@ -17,7 +17,7 @@ def init(): Matrix[Boolean] =
   )
   print(HIDE_CURSOR)
 
-  val flatWorld = generateFlatWorld(20, 10)
+  val flatWorld = generateFlatWorld(50, 50)
   flatWorld
 
 def loop(flatWorld: Matrix[Boolean]): Matrix[Boolean] =
