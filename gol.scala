@@ -72,10 +72,25 @@ def updateFlatWorld(flatWorld: Matrix[Boolean], neighbors: Matrix[Int]): Matrix[
       else false
 
 def prepareToShow(flatWorld: Matrix[Boolean]): Matrix[Character] =
-  val worldCharacter = flatWorld.map(_.map(characterFromBoolean(_)))
-  val worldLinebreak = worldCharacter.map(_ :+ Character.LineBreak)
+  val (evenRows, oddRows) = splitEvenOddRows(flatWorld)
+  val combinedCharacter = combineEvenOddRows(evenRows, oddRows)
+  val worldLinebreak = combinedCharacter.map(_ :+ Character.LineBreak)
   worldLinebreak 
 
+def splitEvenOddRows[T](matrix: Matrix[T]): (Matrix[T], Matrix[T]) =
+  val evenRows = matrix.zipWithIndex.collect { case (row, index) if index % 2 == 0 => row }
+  val oddRows = matrix.zipWithIndex.collect { case (row, index) if index % 2 != 0 => row }
+  (evenRows, oddRows)
+
+def combineEvenOddRows(evenRows: Matrix[Boolean], oddRows: Matrix[Boolean]): Matrix[Character] =
+  evenRows.zip(oddRows).map: (rowE, rowO) =>
+    rowE.zip(rowO).map: (cellE, cellO) =>
+      (cellE, cellO) match
+        case (true, true) => Character.On
+        case (true, false) => Character.Up
+        case (false, true) => Character.Down
+        case (false, false) => Character.Off
+      
 // Testing packaged functions
 import utest.*
 
@@ -143,3 +158,45 @@ private object GolTestSuite extends TestSuite:
           Vector(false, true),
         )
         updateFlatWorld(flatWorld, neighbors) ==> expectedNewFlatWorld
+
+      test("Teile die Matrix in gerade und ungerade Zeilen"):
+        val matrix = Vector(
+          Vector(1, 2, 3),
+          Vector(4, 5, 6),
+          Vector(7, 8, 9),
+          Vector(10, 11, 12)
+        )
+        val (evenRows, oddRows) = splitEvenOddRows(matrix)
+        evenRows ==> Vector(
+          Vector(1, 2, 3),
+          Vector(7, 8, 9)
+        )
+        oddRows ==> Vector(
+          Vector(4, 5, 6),
+          Vector(10, 11, 12)
+        )
+        
+      test("Kombiniere gerade und ungerade Zeilen zu einer Charakter Matrix"):
+        val evenRows = Vector(
+          Vector(true, true),
+          Vector(false, false)
+        )
+        val oddRows = Vector(
+          Vector(true, false),
+          Vector(false, true)
+        )
+        val expectedCombinedMatrix = Vector(
+          Vector(Character.On, Character.Up),
+          Vector(Character.Off, Character.Down)
+        )
+        combineEvenOddRows(evenRows, oddRows) ==> expectedCombinedMatrix
+
+      test("Bereite die Matrix für die Anzeige vor"):
+        val flatWorld = Vector(
+          Vector(true, true, false, false),
+          Vector(true, false, true, false),
+        )
+        val expectedPreparedMatrix = Vector(
+          Vector(Character.On, Character.Up, Character.Down, Character.Off, Character.LineBreak),
+        )
+        prepareToShow(flatWorld) ==> expectedPreparedMatrix
