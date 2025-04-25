@@ -5,24 +5,25 @@ import scala.compiletime.ops.int
 
 type Matrix[T] = Vector[Vector[T]]
 
-val HIDE_CURSOR = "\u001b[?25l"
-val SHOW_CURSOR = "\u001b[?25h"
-
 enum Character:
   case On, Off, Up, Down, LineBreak
 
-def init(): Unit =
+val HIDE_CURSOR = "\u001b[?25l"
+val SHOW_CURSOR = "\u001b[?25h"
+
+def init(): Matrix[Boolean] =
   scala.sys.addShutdownHook(
     print(SHOW_CURSOR)
   )
   print(HIDE_CURSOR)
 
-def loop(): Unit =
-  clearScreen()
-
   val flatWorld = generateFlatWorld(20, 10)
+  flatWorld
 
-  printFlatWorld(flatWorld)
+def loop(state: Matrix[Boolean]): Matrix[Boolean] =
+  clearScreen()
+  printFlatWorld(state)
+  state
 
 def delay(): Unit =
   Thread.sleep(500)
@@ -38,14 +39,20 @@ def printCharacter(c: Character): Unit =
     case Character.Down      => print("▄")
     case Character.LineBreak => println()
 
-def printFlatWorld(world: Matrix[Character]): Unit =
-  val worldLinebreak = world.map(_ :+ Character.LineBreak)
+def characterFromBoolean(b: Boolean): Character =
+  b match
+    case true  => Character.On
+    case false => Character.Off
+
+def printFlatWorld(world: Matrix[Boolean]): Unit =
+  val worldCharacter = world.map(_.map(characterFromBoolean(_)))
+  val worldLinebreak = worldCharacter.map(_ :+ Character.LineBreak)
   worldLinebreak.map(_.map(printCharacter(_)))
 
-def generateFlatWorld(breite: Int, höhe: Int): Matrix[Character] =
+def generateFlatWorld(breite: Int, höhe: Int): Matrix[Boolean] =
   val flatWorld = Vector.fill(höhe, breite)(Random.nextInt(2) match
-    case 0 => Character.Off
-    case 1 => Character.On
+    case 0 => false
+    case 1 => true
   )
   flatWorld
 
@@ -75,9 +82,9 @@ private object GolTestSuite extends TestSuite:
       flatWorld.size ==> 4
       flatWorld(0).size ==> 10
 
-    test("FlatWorld ist vom TypMatrix[Character]"):
+    test("FlatWorld ist vom Typ Matrix[Boolean]"):
       val flatWorld = generateFlatWorld(10, 4)
-      flatWorld.isInstanceOf[Vector[Vector[Character]]] ==> true
+      flatWorld.isInstanceOf[Matrix[Boolean]] ==> true
 
     test("Bestimme die lebenden Nachbarn"):
       val flatWorld = Vector(
@@ -113,3 +120,7 @@ private object GolTestSuite extends TestSuite:
       )
       val donutWorld = formDonutWorld(flatWorld)
       donutWorld ==> expectedDonutWorld
+
+      test("Konvertiere Boolean in Character"):
+        characterFromBoolean(true) ==> Character.On
+        characterFromBoolean(false) ==> Character.Off

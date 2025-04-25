@@ -1,7 +1,12 @@
+import scala.annotation.tailrec
+
 @main
 def hello(): Unit =
-  gol.init()
+  val initialState = gol.init()
+  loop(initialState)
 
-  while (true)
-    gol.loop()
-    gol.delay()
+@tailrec
+def loop(state: Vector[Vector[Boolean]]): Unit =
+  val nextState = gol.loop(state)
+  gol.delay()
+  loop(nextState)
