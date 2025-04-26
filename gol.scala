@@ -8,16 +8,17 @@ type Matrix[T] = Vector[Vector[T]]
 enum Character:
   case On, Off, Up, Down, LineBreak
 
-val HIDE_CURSOR = "\u001b[?25l"
-val SHOW_CURSOR = "\u001b[?25h"
+val CURSOR_HIDE = "\u001b[?25l"
+val CURSOR_SHOW = "\u001b[?25h"
+val DMINENSION = 50
 
 def init(): Matrix[Boolean] =
   scala.sys.addShutdownHook(
-    print(SHOW_CURSOR)
+    print(CURSOR_SHOW)
   )
-  print(HIDE_CURSOR)
+  print(CURSOR_HIDE)
 
-  val flatWorld = generateFlatWorld(50, 50)
+  val flatWorld = generateFlatWorld(DMINENSION, DMINENSION)
   flatWorld
 
 def loop(flatWorld: Matrix[Boolean]): Matrix[Boolean] =
@@ -26,71 +27,88 @@ def loop(flatWorld: Matrix[Boolean]): Matrix[Boolean] =
   val newFlatWorld = updateFlatWorld(flatWorld, neighbors)
   newFlatWorld
 
-def characterFromBoolean(b: Boolean): Character = 
-  b match
-    case true  => Character.On
-    case false => Character.Off
+def prepareToShow(flatWorld: Matrix[Boolean]): Matrix[Character] =
+  val (evenRows, oddRows) = splitEvenOddRows(flatWorld)
+  val combinedCharacter = combineEvenOddRows(evenRows, oddRows)
+  val worldLinebreak = combinedCharacter.map(_ :+ Character.LineBreak)
+  worldLinebreak
 
-def generateFlatWorld(breite: Int, höhe: Int): Matrix[Boolean] =
-  val flatWorld = Vector.fill(höhe, breite)(Random.nextInt(2) match
-    case 0 => false
-    case 1 => true
+private def generateFlatWorld(breite: Int, höhe: Int): Matrix[Boolean] =
+  val flatWorld = Vector.fill(höhe, breite)(
+    Random.nextInt(2) match
+      case 0 => false
+      case 1 => true
   )
   flatWorld
 
-def countNeighbors(donutWorld: Matrix[Boolean]): Matrix[Int] =
+private def countNeighbors(donutWorld: Matrix[Boolean]): Matrix[Int] =
   val kernel = Vector(
     Vector(1, 1, 1),
     Vector(1, 0, 1),
     Vector(1, 1, 1)
   )
-  convolute(kernel, donutWorld)
+  val neighbors = convolute(kernel, donutWorld)
+  neighbors
 
-def convolute(kernel: Matrix[Int], input: Matrix[Boolean]): Matrix[Int] =
+private def convolute(kernel: Matrix[Int], input: Matrix[Boolean]): Matrix[Int] =
   implicit def bool2int(b: Boolean): Int = if b then 1 else 0
 
-  input
+  val convolutionMatrix = input
     .sliding(kernel.size)
     .map(
       _.transpose
-        .sliding(kernel(0).size)
+        .sliding(kernel.head.size)
         .toVector
         .map(_.flatten.zip(kernel.flatten).map(_ * _).sum)
     )
     .toVector
+  convolutionMatrix
 
-def formDonutWorld[T](m: Matrix[T]): Matrix[T] =
+private def formDonutWorld[T](m: Matrix[T]): Matrix[T] =
   val mUpDown = m.last +: m :+ m.head
   val mLeftRight = mUpDown.map(row => row.last +: row :+ row.head)
   mLeftRight
 
-def updateFlatWorld(flatWorld: Matrix[Boolean], neighbors: Matrix[Int]): Matrix[Boolean] =
-  flatWorld.zip(neighbors).map: (rowFW, rowN) =>
-    rowFW.zip(rowN).map: (cellFW, cellN) =>
-      if cellFW && (cellN == 2 || cellN == 3) then true
-      else if !cellFW && cellN == 3 then true
-      else false
+private def updateFlatWorld(
+    flatWorld: Matrix[Boolean],
+    neighbors: Matrix[Int]
+): Matrix[Boolean] =
+  val newFlatWorld = flatWorld
+    .zip(neighbors)
+    .map: (rowsFW, rowsN) =>
+      rowsFW
+        .zip(rowsN)
+        .map: (cellsFW, cellsN) =>
+          (cellsFW, cellsN) match
+            case (true, 2 | 3) => true
+            case (false, 3)    => true
+            case _             => false
+  newFlatWorld
 
-def prepareToShow(flatWorld: Matrix[Boolean]): Matrix[Character] =
-  val (evenRows, oddRows) = splitEvenOddRows(flatWorld)
-  val combinedCharacter = combineEvenOddRows(evenRows, oddRows)
-  val worldLinebreak = combinedCharacter.map(_ :+ Character.LineBreak)
-  worldLinebreak 
-
-def splitEvenOddRows[T](matrix: Matrix[T]): (Matrix[T], Matrix[T]) =
-  val evenRows = matrix.zipWithIndex.collect { case (row, index) if index % 2 == 0 => row }
-  val oddRows = matrix.zipWithIndex.collect { case (row, index) if index % 2 != 0 => row }
+private def splitEvenOddRows[T](matrix: Matrix[T]): (Matrix[T], Matrix[T]) =
+  val evenRows = matrix.zipWithIndex.collect:
+    case (row, index) if index % 2 == 0 => row
+  val oddRows = matrix.zipWithIndex.collect:
+    case (row, index) if index % 2 != 0 => row
   (evenRows, oddRows)
 
-def combineEvenOddRows(evenRows: Matrix[Boolean], oddRows: Matrix[Boolean]): Matrix[Character] =
-  evenRows.zip(oddRows).map: (rowE, rowO) =>
-    rowE.zip(rowO).map: (cellE, cellO) =>
-      (cellE, cellO) match
-        case (true, true) => Character.On
-        case (true, false) => Character.Up
-        case (false, true) => Character.Down
-        case (false, false) => Character.Off
-      
+private def combineEvenOddRows(
+    evenRows: Matrix[Boolean],
+    oddRows: Matrix[Boolean]
+): Matrix[Character] =
+  val combineMatrix = evenRows
+    .zip(oddRows)
+    .map: (evenRow, oddRow) =>
+      evenRow
+        .zip(oddRow)
+        .map: (evenCell, oddCell) =>
+          (evenCell, oddCell) match
+            case (true, true)   => Character.On
+            case (true, false)  => Character.Up
+            case (false, true)  => Character.Down
+            case (false, false) => Character.Off
+  combineMatrix
+
 // Testing packaged functions
 import utest.*
 
@@ -99,7 +117,7 @@ private object GolTestSuite extends TestSuite:
     test("FlatWorld hat Größe von 10 x 4 Elementen"):
       val flatWorld = generateFlatWorld(10, 4)
       flatWorld.size ==> 4
-      flatWorld(0).size ==> 10
+      flatWorld.head.size ==> 10
 
     test("FlatWorld ist vom Typ Matrix[Boolean]"):
       val flatWorld = generateFlatWorld(10, 4)
@@ -140,10 +158,6 @@ private object GolTestSuite extends TestSuite:
       val donutWorld = formDonutWorld(flatWorld)
       donutWorld ==> expectedDonutWorld
 
-      test("Konvertiere Boolean in Character"):
-        characterFromBoolean(true) ==> Character.On
-        characterFromBoolean(false) ==> Character.Off
-
       test("Spielregeln"):
         val flatWorld = Vector(
           Vector(true, true),
@@ -151,11 +165,11 @@ private object GolTestSuite extends TestSuite:
         )
         val neighbors = Vector(
           Vector(1, 2),
-          Vector(4, 3),
+          Vector(4, 3)
         )
         val expectedNewFlatWorld = Vector(
           Vector(false, true),
-          Vector(false, true),
+          Vector(false, true)
         )
         updateFlatWorld(flatWorld, neighbors) ==> expectedNewFlatWorld
 
@@ -175,7 +189,7 @@ private object GolTestSuite extends TestSuite:
           Vector(4, 5, 6),
           Vector(10, 11, 12)
         )
-        
+
       test("Kombiniere gerade und ungerade Zeilen zu einer Charakter Matrix"):
         val evenRows = Vector(
           Vector(true, true),
@@ -194,9 +208,15 @@ private object GolTestSuite extends TestSuite:
       test("Bereite die Matrix für die Anzeige vor"):
         val flatWorld = Vector(
           Vector(true, true, false, false),
-          Vector(true, false, true, false),
+          Vector(true, false, true, false)
         )
         val expectedPreparedMatrix = Vector(
-          Vector(Character.On, Character.Up, Character.Down, Character.Off, Character.LineBreak),
+          Vector(
+            Character.On,
+            Character.Up,
+            Character.Down,
+            Character.Off,
+            Character.LineBreak
+          )
         )
         prepareToShow(flatWorld) ==> expectedPreparedMatrix
