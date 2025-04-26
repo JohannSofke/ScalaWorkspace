@@ -12,13 +12,13 @@ val CURSOR_HIDE = "\u001b[?25l"
 val CURSOR_SHOW = "\u001b[?25h"
 val DMINENSION = 50
 
-def init(): Matrix[Boolean] =
+def init(seed: Int): Matrix[Boolean] =
   scala.sys.addShutdownHook(
     print(CURSOR_SHOW)
   )
   print(CURSOR_HIDE)
 
-  val flatWorld = generateFlatWorld(DMINENSION, DMINENSION)
+  val flatWorld = generateFlatWorld(DMINENSION, DMINENSION, seed)
   flatWorld
 
 def loop(flatWorld: Matrix[Boolean]): Matrix[Boolean] =
@@ -41,9 +41,14 @@ def prepareToShow(flatWorld: Matrix[Boolean]): String =
     combinedCharacter.map(_.map(toCharacter(_)).mkString).mkString("\r\n")
   worldString
 
-private def generateFlatWorld(breite: Int, höhe: Int): Matrix[Boolean] =
+private def generateFlatWorld(
+    breite: Int,
+    höhe: Int,
+    seed: Int
+): Matrix[Boolean] =
+  val rnd = new Random(seed)
   val flatWorld = Vector.fill(höhe, breite)(
-    Random.nextInt(2) match
+    rnd.nextInt(2) match
       case 0 => false
       case 1 => true
   )
@@ -126,12 +131,12 @@ import utest.*
 private object GolTestSuite extends TestSuite:
   val tests = Tests:
     test("FlatWorld hat Größe von 10 x 4 Elementen"):
-      val flatWorld = generateFlatWorld(10, 4)
+      val flatWorld = generateFlatWorld(10, 4, 0)
       flatWorld.size ==> 4
       flatWorld.head.size ==> 10
 
     test("FlatWorld ist vom Typ Matrix[Boolean]"):
-      val flatWorld = generateFlatWorld(10, 4)
+      val flatWorld = generateFlatWorld(10, 4, 0)
       flatWorld.isInstanceOf[Matrix[Boolean]] ==> true
 
     test("Bestimme die lebenden Nachbarn"):
