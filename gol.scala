@@ -6,7 +6,7 @@ import scala.compiletime.ops.int
 type Matrix[T] = Vector[Vector[T]]
 
 enum Character:
-  case On, Off, Up, Down, LineBreak
+  case On, Off, Up, Down
 
 val CURSOR_HIDE = "\u001b[?25l"
 val CURSOR_SHOW = "\u001b[?25h"
@@ -27,11 +27,19 @@ def loop(flatWorld: Matrix[Boolean]): Matrix[Boolean] =
   val newFlatWorld = updateFlatWorld(flatWorld, neighbors)
   newFlatWorld
 
-def prepareToShow(flatWorld: Matrix[Boolean]): Matrix[Character] =
+private def toCharacter(c: gol.Character): String =
+  c match
+    case Character.On   => "█"
+    case Character.Off  => " "
+    case Character.Up   => "▀"
+    case Character.Down => "▄"
+
+def prepareToShow(flatWorld: Matrix[Boolean]): String =
   val (evenRows, oddRows) = splitEvenOddRows(flatWorld)
   val combinedCharacter = combineEvenOddRows(evenRows, oddRows)
-  val worldLinebreak = combinedCharacter.map(_ :+ Character.LineBreak)
-  worldLinebreak
+  val worldString =
+    combinedCharacter.map(_.map(toCharacter(_)).mkString).mkString("\r\n")
+  worldString
 
 private def generateFlatWorld(breite: Int, höhe: Int): Matrix[Boolean] =
   val flatWorld = Vector.fill(höhe, breite)(
@@ -50,7 +58,10 @@ private def countNeighbors(donutWorld: Matrix[Boolean]): Matrix[Int] =
   val neighbors = convolute(kernel, donutWorld)
   neighbors
 
-private def convolute(kernel: Matrix[Int], input: Matrix[Boolean]): Matrix[Int] =
+private def convolute(
+    kernel: Matrix[Int],
+    input: Matrix[Boolean]
+): Matrix[Int] =
   implicit def bool2int(b: Boolean): Int = if b then 1 else 0
 
   val convolutionMatrix = input
@@ -208,15 +219,10 @@ private object GolTestSuite extends TestSuite:
       test("Bereite die Matrix für die Anzeige vor"):
         val flatWorld = Vector(
           Vector(true, true, false, false),
+          Vector(true, false, true, false),
+          Vector(true, true, false, false),
           Vector(true, false, true, false)
         )
-        val expectedPreparedMatrix = Vector(
-          Vector(
-            Character.On,
-            Character.Up,
-            Character.Down,
-            Character.Off,
-            Character.LineBreak
-          )
-        )
-        prepareToShow(flatWorld) ==> expectedPreparedMatrix
+        val expectedString = "█▀▄ \r\n█▀▄ "
+
+        prepareToShow(flatWorld) ==> expectedString
