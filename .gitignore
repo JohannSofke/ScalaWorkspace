@@ -4,6 +4,7 @@
 # Compiled files
 *.class
 *.log
+*.jar
 
 # Metals (Scala Language Server) files
 /.metals/
