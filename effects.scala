@@ -1,7 +1,7 @@
 package effects
 
-def delay(): Unit =
-  Thread.sleep(200)
+def delay(milliseconds: Int): Unit =
+  Thread.sleep(milliseconds)
 
 def clearScreen(): Unit =
   println("\u001bc")

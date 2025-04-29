@@ -9,7 +9,7 @@ def main(seed: Int): Unit =
 def loop(state: gol.Matrix[Boolean]): Unit =
   effects.clearScreen()
   effects.showWorld(gol.prepareToShow(state))
-  effects.delay()
+  effects.delay(200)
 
   val nextState = gol.loop(state)
   loop(nextState)
