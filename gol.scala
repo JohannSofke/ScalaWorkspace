@@ -8,15 +8,13 @@ type Matrix[T] = Vector[Vector[T]]
 enum Character:
   case On, Off, Up, Down
 
-val CURSOR_HIDE = "\u001b[?25l"
-val CURSOR_SHOW = "\u001b[?25h"
 val DMINENSION = 50
 
 def init(seed: Int): Matrix[Boolean] =
   scala.sys.addShutdownHook(
-    print(CURSOR_SHOW)
+    effects.showCursor()
   )
-  print(CURSOR_HIDE)
+  effects.hideCursor()
 
   val flatWorld = generateFlatWorld(DMINENSION, DMINENSION, seed)
   flatWorld
