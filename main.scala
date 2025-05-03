@@ -8,7 +8,7 @@ def main(seed: Int): Unit =
 
 @tailrec
 def loop(state: gol.Matrix[Boolean]): Unit =
-  effects.resetTerminal()
+  effects.resetCursor()
   effects.showWorld(gol.prepareToShow(state))
   effects.delay(200)
 

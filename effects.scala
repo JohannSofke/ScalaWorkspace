@@ -2,16 +2,20 @@ package effects
 
 def initTerminal(): Unit =
   scala.sys.addShutdownHook(
-    showCursor()
+    shutdownHook()
   )
   hideCursor()
+  activateAlternativeScreenBuffer()
+
+def shutdownHook(): Unit =
+  deactivateAlternativeScreenBuffer()
+  showCursor()
 
 def delay(milliseconds: Int): Unit =
   Thread.sleep(milliseconds)
 
-def resetTerminal(): Unit =
-  print("\u001bc")
-  hideCursor()
+def resetCursor(): Unit =
+  print("\u001b[H")
 
 def showCursor(): Unit =
   print("\u001b[?25h")
@@ -21,3 +25,9 @@ def hideCursor(): Unit =
 
 def showWorld(world: String): Unit =
   println(world)
+
+def activateAlternativeScreenBuffer(): Unit =
+  print("\u001b[?1049h")
+
+def deactivateAlternativeScreenBuffer(): Unit =
+  print("\u001b[?1049l")
