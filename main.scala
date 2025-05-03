@@ -2,6 +2,7 @@ import scala.annotation.tailrec
 
 @main
 def main(seed: Int): Unit =
+  effects.initTerminal()
   val initialState = gol.init(seed)
   loop(initialState)
 

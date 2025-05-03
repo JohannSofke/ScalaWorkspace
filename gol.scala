@@ -11,11 +11,6 @@ enum Character:
 val DMINENSION = 50
 
 def init(seed: Int): Matrix[Boolean] =
-  scala.sys.addShutdownHook(
-    effects.showCursor()
-  )
-  effects.hideCursor()
-
   val flatWorld = generateFlatWorld(DMINENSION, DMINENSION, seed)
   flatWorld
 

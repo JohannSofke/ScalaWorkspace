@@ -1,5 +1,11 @@
 package effects
 
+def initTerminal(): Unit =
+  scala.sys.addShutdownHook(
+    showCursor()
+  )
+  hideCursor()
+
 def delay(milliseconds: Int): Unit =
   Thread.sleep(milliseconds)
 
